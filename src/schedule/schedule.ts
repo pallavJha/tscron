@@ -1,22 +1,22 @@
-export const InvalidPositionError = new Error("invalid position for the Spec Schedule, must be between 0-5 inclusive")
+import {Number64} from "../parser/number64";
 
 export class SpecSchedule {
-    minute: number;
-    hour: number;
-    dom: number;
-    month: number;
-    dow: number;
+    minute: Number64;
+    hour: Number64;
+    dom: Number64;
+    month: Number64;
+    dow: Number64;
 
 
     constructor() {
-        this.minute = 0
-        this.hour = 0
-        this.dom = 0
-        this.month = 0
-        this.dow = 0
+        this.minute = new Number64();
+        this.hour = new Number64();
+        this.dom = new Number64();
+        this.month = new Number64();
+        this.dow = new Number64();
     }
 
-    set(pos: number, range: number) {
+    set(pos: number, range: Number64) {
         switch (pos) {
             case 0:
                 this.minute = range
@@ -34,7 +34,9 @@ export class SpecSchedule {
                 this.dow = range
                 break;
             default:
-                throw InvalidPositionError
+                throw invalidPositionError
         }
     }
 }
+
+export const invalidPositionError = new Error("invalid position for the Spec Schedule, must be between 0-5 inclusive")

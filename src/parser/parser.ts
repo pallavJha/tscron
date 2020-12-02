@@ -1,4 +1,6 @@
 import {SpecSchedule} from "../schedule/schedule";
+import {BaseError} from "./base_error";
+import {Number64} from "./number64";
 
 const NumberOfFields = 5
 
@@ -38,7 +40,7 @@ export function parse(spec: string): SpecSchedule {
     return schedule
 }
 
-function getRange(expr: string, r: Range): number {
+function getRange(expr: string, r: Range): Number64 {
     let start: number;
     let end: number;
     let step: number;
@@ -103,12 +105,20 @@ function mustParseInt(expr: string): number {
     return num
 }
 
-function getBits(min: number, max: number, step: number): number {
-    let bits: number = 0;
+function getBits(min: number, max: number, step: number): Number64 {
+    const bits: Number64 = new Number64();
 
     for (let i = min; i <= max; i += step) {
         // tslint:disable-next-line:no-bitwise
-        bits |= 1 << i;
+        bits.setBit(i);
     }
     return bits
 }
+
+export class ParseError extends BaseError {
+    constructor(public message: string) {
+        super();
+    }
+}
+
+export const parseError = new ParseError("invalid format for the cron, follow * * * * *");
