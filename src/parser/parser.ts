@@ -1,5 +1,4 @@
 import {SpecSchedule} from "../schedule/schedule";
-import {BaseError} from "./base_error";
 import {Number64} from "./number64";
 
 const NumberOfFields = 5
@@ -24,12 +23,12 @@ const fieldDefinitions = [
 
 export function parse(spec: string): SpecSchedule {
     if (spec === undefined || spec.length === 0) {
-        throw parseError
+        throw ParseError
     }
 
     const fields = spec.split(" ");
     if (NumberOfFields !== fields.length) {
-        throw parseError
+        throw ParseError
     }
 
     const schedule: SpecSchedule = new SpecSchedule();
@@ -61,7 +60,7 @@ function getRange(expr: string, r: Range): Number64 {
                 end = mustParseInt(lowAndHigh[1])
                 break;
             default:
-                throw new ParseError("Too many hyphens: Only use one hyphen for setting the range, like, 1-15")
+                throw new Error("Too many hyphens: Only use one hyphen for setting the range, like, 1-15")
         }
     }
 
@@ -76,20 +75,20 @@ function getRange(expr: string, r: Range): Number64 {
             }
             break
         default:
-            throw new ParseError("Too many Slashes: Only use one slash for setting the range, like, 1-15/2 or 3/5")
+            throw new Error("Too many Slashes: Only use one slash for setting the range, like, 1-15/2 or 3/5")
     }
 
     if (start < r.start) {
-        throw new ParseError("beginning of range " + start + " below minimum " + r.start + ": " + expr)
+        throw new Error("beginning of range " + start + " below minimum " + r.start + ": " + expr)
     }
     if (end > r.end) {
-        throw new ParseError("end of range " + end + " above maximum " + r.end + ": " + expr)
+        throw new Error("end of range " + end + " above maximum " + r.end + ": " + expr)
     }
     if (r.start > end) {
-        throw new ParseError("beginning of range " + start + " beyond end of range " + end + ": " + expr)
+        throw new Error("beginning of range " + start + " beyond end of range " + end + ": " + expr)
     }
     if (step === 0) {
-        throw new ParseError("step of range should be a positive number: " + expr)
+        throw new Error("step of range should be a positive number: " + expr)
     }
 
     return getBits(start, end, step)
@@ -99,7 +98,7 @@ function getRange(expr: string, r: Range): Number64 {
 function mustParseInt(expr: string): number {
     const num = parseInt(expr, 10)
     if (num <= 0) {
-        throw new ParseError("Negative numbers are not allowed in the cron expression")
+        throw new Error("Negative numbers are not allowed in the cron expression")
     }
 
     return num
@@ -109,16 +108,9 @@ function getBits(min: number, max: number, step: number): Number64 {
     const bits: Number64 = new Number64();
 
     for (let i = min; i <= max; i += step) {
-        // tslint:disable-next-line:no-bitwise
         bits.setBit(i);
     }
     return bits
 }
 
-export class ParseError extends BaseError {
-    constructor(public message: string) {
-        super();
-    }
-}
-
-export const parseError = new ParseError("invalid format for the cron, follow * * * * *");
+export const ParseError = new Error("invalid format for the cron, follow * * * * *");

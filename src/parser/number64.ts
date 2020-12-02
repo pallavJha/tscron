@@ -1,5 +1,3 @@
-import {BaseError} from "./base_error"
-
 export class Number64 {
     start: number;
     end: number;
@@ -15,16 +13,10 @@ export class Number64 {
         } else if (pos < 60) {
             this.end |= 1 << (pos % 30)
         } else {
-            throw invalidBitError;
+            throw InvalidBitError;
         }
     }
 }
 
 
-export class InvalidBitError extends BaseError {
-    constructor(public message: string) {
-        super();
-    }
-}
-
-export const invalidBitError = new InvalidBitError("Indexes only between [0, 59] can be set");
+export const InvalidBitError = new Error("Indexes only between [0, 59] can be set");

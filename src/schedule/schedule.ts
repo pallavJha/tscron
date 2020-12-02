@@ -34,9 +34,9 @@ export class SpecSchedule {
                 this.dow = range
                 break;
             default:
-                throw invalidPositionError
+                throw InvalidPositionError
         }
     }
 }
 
-export const invalidPositionError = new Error("invalid position for the Spec Schedule, must be between 0-5 inclusive")
+export const InvalidPositionError = new Error("invalid position for the Spec Schedule, must be between 0-5 inclusive")
