@@ -1,4 +1,7 @@
-import {Number64} from "../parser/number64";
+import {Number64, Spec} from "../parser/spec"
+
+export const InvalidPositionError = new Error("invalid position for the Spec Schedule, must be between 0-5 inclusive");
+export const NoReachableDateError = new Error("No valid date for the cron available in the next 5 years");
 
 class NextDateRequest {
     currentDate: Date;
@@ -18,40 +21,40 @@ const MaxDayOfWeekStart = 127;
 const MaxDayOfWeekEnd = 0;
 
 export class SpecSchedule {
-    seconds: Number64;
-    minute: Number64;
-    hour: Number64;
-    dom: Number64;
-    month: Number64;
-    dow: Number64;
+    seconds: Spec;
+    minute: Spec;
+    hour: Spec;
+    dom: Spec;
+    month: Spec;
+    dow: Spec;
 
 
     constructor() {
-        this.minute = new Number64();
-        this.hour = new Number64();
-        this.dom = new Number64();
-        this.month = new Number64();
-        this.dow = new Number64();
-        this.seconds = new Number64();
+        this.minute = new Spec(new Number64(), []);
+        this.hour = new Spec(new Number64(), []);
+        this.dom = new Spec(new Number64(), []);
+        this.month = new Spec(new Number64(), []);
+        this.dow = new Spec(new Number64(), []);
+        this.seconds = new Spec(new Number64(), []);
         this.seconds.setBit(0)
     }
 
-    public set(pos: number, range: Number64) {
+    public set(pos: number, spec: Spec) {
         switch (pos) {
             case 0:
-                this.minute = range;
+                this.minute = spec;
                 break;
             case 1:
-                this.hour = range;
+                this.hour = spec;
                 break;
             case 2:
-                this.dom = range;
+                this.dom = spec;
                 break;
             case 3:
-                this.month = range;
+                this.month = spec;
                 break;
             case 4:
-                this.dow = range;
+                this.dow = spec;
                 break;
             default:
                 throw InvalidPositionError
@@ -154,15 +157,31 @@ export class SpecSchedule {
     private dayMatches(req: NextDateRequest) {
         const domMatch = this.dom.getBit(req.currentDate.getDate());
         const dowMatch = this.dow.getBit(req.currentDate.getDay());
-        if (this.dom.start === MaxMonthStart && this.dom.end === MaxMonthEnd) {
+        if (this.dom.getStart() === MaxMonthStart && this.dom.getEnd() === MaxMonthEnd) {
             return dowMatch
         }
-        if (this.dow.start === MaxDayOfWeekStart && this.dow.end === MaxDayOfWeekEnd) {
+        if (this.dow.getStart() === MaxDayOfWeekStart && this.dow.getEnd() === MaxDayOfWeekEnd) {
             return domMatch
         }
         return domMatch || dowMatch
     }
-}
 
-export const InvalidPositionError = new Error("invalid position for the Spec Schedule, must be between 0-5 inclusive");
-export const NoReachableDateError = new Error("No valid date for the cron available in the next 5 years");
+
+    public describe(): string {
+        let descriptionBuffer: string = "";
+        descriptionBuffer = descriptionBuffer + this.minute.describe();
+        if (descriptionBuffer.length === 0) {
+            descriptionBuffer = "Every minute "
+        }
+        descriptionBuffer = descriptionBuffer.trim() + " " + this.hour.describe().trim();
+        descriptionBuffer = descriptionBuffer.trim() + " " + this.dom.describe().trim();
+        descriptionBuffer = descriptionBuffer.trim() + " " + this.month.describe().trim();
+        descriptionBuffer = descriptionBuffer.trim() + " " + this.dow.describe().trim();
+
+        if (descriptionBuffer.length === 0) {
+            return "Every minute"
+        }
+
+        return descriptionBuffer.trim()
+    }
+}

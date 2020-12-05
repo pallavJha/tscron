@@ -1,29 +1,32 @@
 import {SpecSchedule} from "../schedule/schedule";
-import {Number64} from "./number64";
+import {Number64, Part, Spec} from "./spec";
+import {DayOfTheMonthSpec, DayOfTheWeekSpec, HourSpec, MinuteSpec, MonthSpec, SpecType} from "./spec_types";
 
 const NumberOfFields = 5;
 
 export class Range {
     start: number;
     end: number;
+    specType: SpecType;
 
-    constructor(start: number, end: number) {
+    constructor(start: number, end: number, specType: SpecType) {
         this.start = start;
-        this.end = end
+        this.end = end;
+        this.specType = specType;
     }
 }
 
 export const fieldDefinitions = [
     // minutes
-    new Range(0, 59),
+    new Range(0, 59, MinuteSpec),
     // hours
-    new Range(0, 23),
+    new Range(0, 23, HourSpec),
     // day of the month
-    new Range(1, 31),
+    new Range(1, 31, DayOfTheMonthSpec),
     // month of the year
-    new Range(1, 12),
+    new Range(1, 12, MonthSpec),
     // day of the week
-    new Range(0, 6),
+    new Range(0, 6, DayOfTheWeekSpec),
 ];
 
 export function parse(spec: string): SpecSchedule {
@@ -45,25 +48,29 @@ export function parse(spec: string): SpecSchedule {
 }
 
 export function getField(expr: string, r: Range) {
-    const schedule: Number64 = new Number64();
+    const bits = new Number64();
+    const spec = new Spec(bits, []);
+    spec.type = r.specType;
     const expressions = expr.split(",");
-    for (let i = 0; i < expressions.length; i++) {
-        schedule.merge(getRange(expressions[i].trim(), r))
+    for (const expression of expressions) {
+        spec.merge(getRange(expression.trim(), r))
     }
-    return schedule
+    return spec
 }
 
-export function getRange(expr: string, r: Range): Number64 {
+export function getRange(expr: string, r: Range): Spec {
     let start: number;
     let end: number;
     let step: number;
+    let allAvailable: boolean = false;
     const rangeAndStep = expr.split("/");
     const lowAndHigh = rangeAndStep[0].split("-");
     const singleDigit = lowAndHigh.length === 1;
 
     if (lowAndHigh[0] === "*" || lowAndHigh[0] === "?") {
         start = r.start;
-        end = r.end
+        end = r.end;
+        allAvailable = true;
     } else {
         start = mustParseInt(lowAndHigh[0]);
         switch (lowAndHigh.length) {
@@ -83,9 +90,9 @@ export function getRange(expr: string, r: Range): Number64 {
             step = 1;
             break;
         case 2:
-            // Special handling: "N/step" means "N-max/step".
             step = mustParseInt(rangeAndStep[1]);
             if (singleDigit) {
+                // special handling: "N/step" means "N-max/step".
                 end = r.end
             }
             break;
@@ -106,7 +113,10 @@ export function getRange(expr: string, r: Range): Number64 {
         throw new Error("Step of range should be a positive number: " + expr)
     }
 
-    return getBits(start, end, step)
+    const spec = setBits(start, end, step);
+    spec.type = r.specType;
+    spec.parts[0].allAvailable = allAvailable;
+    return spec
 }
 
 
@@ -119,13 +129,13 @@ export function mustParseInt(expr: string): number {
     return num
 }
 
-export function getBits(min: number, max: number, step: number): Number64 {
-    const bits: Number64 = new Number64();
+export function setBits(min: number, max: number, step: number): Spec {
+    const spec: Spec = new Spec(new Number64(), [new Part(min, max, step)]);
 
     for (let i = min; i <= max; i += step) {
-        bits.setBit(i);
+        spec.setBit(i);
     }
-    return bits
+    return spec
 }
 
 export const ParseError = new Error("invalid format for the cron, follow * * * * *");

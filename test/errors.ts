@@ -1,5 +1,5 @@
 import {strict as assert} from 'assert';
-import {InvalidBitError} from "../src/parser/number64";
+import {InvalidBitError} from "../src/parser/spec";
 import {ParseError} from "../src/parser/parser";
 import {InvalidPositionError} from "../src/schedule/schedule";
 
