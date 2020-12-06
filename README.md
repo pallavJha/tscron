@@ -1,12 +1,12 @@
 #### ts-cron
 
 TS-CRON is a library for cron. It provides a class named `SpecSchedule` that has two methods:
-- `next(cronSyntax:string, date:Date):Date`
+- [`next(cronSyntax:string, date:Date):Date`](https://github.com/pallavJha/tscron/blob/master/src/schedule/schedule.ts#L70)
 This method returns a new Date on which the cron is supposed to run after the provided date. For example, if
 the current date is: `2020 December 5`, and the cron syntax is `* * 1 * *` then the output will be 
 `1/1/2021, 12:00:00 AM`.
 
-- `describe(cronSyntax:string):string`
+- [`describe(cronSyntax:string):string`](https://github.com/pallavJha/tscron/blob/master/src/schedule/schedule.ts#L181)
 This method provides a description of the cron syntax. For example, the description for the cron syntax `* * 1 * *` is
 `Every minute On Day-Of-Month 1`.
 
@@ -14,10 +14,10 @@ This project comes with a command line cli that can used to test with these two 
 ```bash
 $npm run compile
 
-> typescript-project@1.0.0 compile C:\Users\PallavJha\code\typescript-project
+> typescript-project@1.0.0 compile .\typescript-project
 > tsc
 
-$node dist/src/index.js help
+$node dist/src/cli.js help
 ts-cron help:
 
 commands:
@@ -28,13 +28,13 @@ describe: To print the cron description
    Option:
        --cron or -c : For the cron Syntax
 help: To print help docs
-$node dist/src/index.js next --cron="* * 1 * *"
+$node dist/src/cli.js next --cron="* * 1 * *"
 1/1/2021, 12:00:00 AM
-$node dist/src/index.js next -c="* * 1 * *"
+$node dist/src/cli.js next -c="* * 1 * *"
 1/1/2021, 12:00:00 AM
-$node dist/src/index.js describe -c="* * 1 * *"
+$node dist/src/cli.js describe -c="* * 1 * *"
 Every minute On Day-Of-Month 1
-$node dist/src/index.js describe -cron="* * 1 * *"
+$node dist/src/cli.js describe -cron="* * 1 * *"
 Every minute On Day-Of-Month 1
 ```
 
