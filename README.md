@@ -1,5 +1,6 @@
-#### ts-cron
+# ts-cron
 
+### APIs
 TS-CRON is a library for cron. It provides a class named `SpecSchedule` that has two methods:
 - [`next(cronSyntax:string, date:Date):Date`](https://github.com/pallavJha/tscron/blob/master/src/schedule/schedule.ts#L70)
 This method returns a new Date on which the cron is supposed to run after the provided date. For example, if
@@ -10,6 +11,8 @@ the current date is: `2020 December 5`, and the cron syntax is `* * 1 * *` then 
 This method provides a description of the cron syntax. For example, the description for the cron syntax `* * 1 * *` is
 `Every minute On Day-Of-Month 1`.
 
+
+### Example
 This project comes with a command line cli that can used to test with these two methods:
 ```bash
 $npm run compile
@@ -38,6 +41,7 @@ $node dist/src/cli.js describe -cron="* * 1 * *"
 Every minute On Day-Of-Month 1
 ```
 
+### Testing
 The test cases are created using the `mocha` framework, and it can be executed using the following command:
 ```bash
 $npm test
