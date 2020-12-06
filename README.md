@@ -42,7 +42,7 @@ The test cases are created using the `mocha` framework, and it can be executed u
 ```bash
 $npm test
 
-> typescript-project@1.0.0 test C:\Users\PallavJha\code\typescript-project
+> typescript-project@1.0.0 test .\typescript-project
 > env TS_NODE_COMPILER_OPTIONS='{"module": "commonjs" }' mocha -r ts-node/register test/errors.ts test/**/*.ts
 
 
