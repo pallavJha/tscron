@@ -2,8 +2,10 @@ import {SpecSchedule} from "../schedule/schedule";
 import {Number64, Part, Spec} from "./spec";
 import {DayOfTheMonthSpec, DayOfTheWeekSpec, HourSpec, MinuteSpec, MonthSpec, SpecType} from "./spec_types";
 
+// Currently 5 blocks are supported
 const NumberOfFields = 5;
 
+// Range defines the maximum values that the cron specification can have
 export class Range {
     start: number;
     end: number;
@@ -29,6 +31,9 @@ export const fieldDefinitions = [
     new Range(0, 6, DayOfTheWeekSpec),
 ];
 
+// parse splits the cron string on space that results into an array of specs
+// then iteratively calls the getField to create Spec for each one of the
+// string specs
 export function parse(spec: string): SpecSchedule {
     if (spec === undefined || spec.length === 0) {
         throw ParseError
@@ -47,6 +52,8 @@ export function parse(spec: string): SpecSchedule {
     return schedule
 }
 
+// getField calls the getRange function iteratively for each of the parts
+// found after splitting the spec on comma
 export function getField(expr: string, r: Range) {
     const bits = new Number64();
     const spec = new Spec(bits, []);
@@ -58,6 +65,10 @@ export function getField(expr: string, r: Range) {
     return spec
 }
 
+// creates a spec by finding the min and max locations
+// at which Spec should have the bit set.
+// This function works on the Parts found after splitting the spec on comma
+// The part is the first parameter.
 export function getRange(expr: string, r: Range): Spec {
     let start: number;
     let end: number;
@@ -119,7 +130,7 @@ export function getRange(expr: string, r: Range): Spec {
     return spec
 }
 
-
+// converts the expression string into integer.
 export function mustParseInt(expr: string): number {
     const num = parseInt(expr, 10);
     if (num < 0) {
@@ -129,6 +140,8 @@ export function mustParseInt(expr: string): number {
     return num
 }
 
+// Creates a new Spec whose bits are set at the locations between min and max inclusive
+// with gaps = steps
 export function setBits(min: number, max: number, step: number): Spec {
     const spec: Spec = new Spec(new Number64(), [new Part(min, max, step)]);
 

@@ -23,7 +23,7 @@ function getAction(arg: minimist.ParsedArgs): string {
         console.log(help);
         return ""
     }
-    if (!(actions[0] === "next" || actions[0] === "describe")) {
+    if (!(actions[0] === "next" || actions[0] === "describe" || actions[0] === "help")) {
         console.error("Invalid sub command provided!");
         console.log("The valid sub commands are: cron and describe");
         console.log(help);
@@ -47,16 +47,17 @@ function getCronString(arg: minimist.ParsedArgs): string {
 
 const action: string = getAction(args);
 if (action.length !== 0) {
-    if (action === help) {
+    if (action === "help") {
         console.log(help)
-    }
-    const cronString = getCronString(args);
-    const schedule = parse(cronString);
-    if (action === "next") {
-        const nextExecOn = schedule.next(new Date());
-        console.log(nextExecOn.toLocaleString("en-IN", {timeZone: "Asia/Kolkata"}))
     } else {
-        console.log(schedule.describe())
+        const cronString = getCronString(args);
+        const schedule = parse(cronString);
+        if (action === "next") {
+            const nextExecOn = schedule.next(new Date());
+            console.log(nextExecOn.toLocaleString("en-IN", {timeZone: "Asia/Kolkata"}))
+        } else {
+            console.log(schedule.describe())
+        }
     }
 }
 
