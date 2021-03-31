@@ -31,12 +31,16 @@ describe: To print the cron description
    Option:
        --cron or -c : For the cron Syntax
 help: To print help docs
+
 $node dist/src/cli.js next --cron="* * 1 * *"
 1/1/2021, 12:00:00 AM
+
 $node dist/src/cli.js next -c="* * 1 * *"
 1/1/2021, 12:00:00 AM
+
 $node dist/src/cli.js describe -c="* * 1 * *"
 Every minute On Day-Of-Month 1
+
 $node dist/src/cli.js describe -cron="* * 1 * *"
 Every minute On Day-Of-Month 1
 ```
